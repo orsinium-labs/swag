@@ -1,1 +1,1 @@
-from .core import swaggify
+from .core import swaggify, deswaggify

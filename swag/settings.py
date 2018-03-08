@@ -6,7 +6,10 @@ class Settings(dict):
 
 default_settings = dict(
     ignore_case=False,
-    offset=None,                # permament offset for choosing one variant
-    placeholder_case=None,      # placeholder for chars which case not in alphabet
-    placeholder_missed=None,    # placeholder for chars which not in alphabet
+    offset=None,                    # permament offset for choosing one variant
+
+    placeholder_case=None,          # placeholder for chars which case not in alphabet
+    placeholder_missed=None,        # placeholder for chars which not in alphabet
+
+    placeholder_not_found=None,     # like placeholder_missed but for decoding
 )
