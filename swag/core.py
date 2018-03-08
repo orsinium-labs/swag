@@ -1,37 +1,48 @@
 from random import choice
 from .map import mapping
+from .settings import Settings, default_settings
 
 
-def swaggify(text, *, ignore_case=False, offset=None, placeholder_case=None, placeholder_missed=None):
-    result = []
-    for char in text:
+class Swag(object):
+    def __init__(self, **kwargs):
+        self.settings = Settings(**default_settings)
+        for k, v in kwargs.items():
+            if k not in default_settings:
+                raise KeyError('Unknown setting: {}'.format(k))
+        self.settings.update(kwargs)
+
+        self.mapping = mapping
+
+    def _encode_char(self, char):
         # get variants
-        variants = mapping.get(char.lower(), None)
+        variants = self.mapping.get(char.lower(), None)
         if not variants:
-            if placeholder_missed is None:
-                result.append(char)
-            else:
-                result.append(placeholder_missed)
-            continue
+            if self.settings.placeholder_missed is not None:
+                return self.settings.placeholder_missed
+            return char
 
         # select right case
-        if ignore_case:
+        if self.settings.ignore_case:
             variants = ''.join(variants)
         elif variants[0] and char.isupper():
             variants = variants[0]
         elif variants[1] and char.islower():
             variants = variants[1]
-        elif placeholder_case is None:
+        elif self.settings.placeholder_case is not None:
+            variants = self.settings.placeholder_case
+        else:
             variants = ''.join(variants)
-        else:
-            variants = placeholder_case
 
-        # choice random char
+        # choose random char
         if len(variants) == 1:
-            result.append(variants[0])
-        elif offset is None:
-            result.append(choice(variants))
-        else:
-            result.append(variants[offset % len(variants)])
+            return variants[0]
+        elif self.settings.offset is not None:
+            return variants[offset % len(variants)]
+        return choice(variants)
 
-    return ''.join(result)
+    def encode(self, text):
+        return ''.join(self._encode_char(char) for char in text)
+
+
+def swaggify(text, **kwargs):
+    return Swag(**kwargs).encode(text)
